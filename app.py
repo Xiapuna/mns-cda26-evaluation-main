@@ -38,18 +38,40 @@ def list_events() :
 # Routes qui mènent vers la page de création d'un évènement
 @app.route("/create-event", methods=['POST'])
 def create_event_post() : 
+    has_error = False
+    
     title = request.form.get("title")
+    if not title :
+        flash("A name is required.", "error")
+        has_error = True
     type = request.form.get("type")
-    date = datetime.fromisoformat(request.form.get("date"))
+    if not type :
+        flash("A type is required.","error")
+        has_error = True
+    date_str = request.form.get("date")
+    if not date_str :
+        flash("Date is required.","error")
+        has_error = True
     place = request.form.get("place")
+    if not place :
+        flash("A place is required.","error")
+        has_error = True
     description = request.form.get("description")
-
+    if not description :
+        flash("A description is required.","error")
+        has_error = True
+    if has_error:
+        return redirect(url_for("create_event_get"))
+    
+    date = datetime.fromisoformat(date_str)
+    
     event = Event(title=title, type=type, date=date, place=place, description=description)
     db.session.add(event)
     db.session.commit()
-    print(event)
     
-    return render_template("create-event.html", event=event)
+    flash("Event created successfully!", "success")
+    return redirect(url_for("list_events"))
+
 
 # Route permettant l'affichage de la page de création d'évènements après soumission du form.
 @app.route("/create-event", methods=['GET'])
