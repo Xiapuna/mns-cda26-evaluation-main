@@ -9,7 +9,7 @@
 <form action="/create-event" method="POST" class="space-y-6">
     <div>
         <label class="block font-medium mb-1" for="title">Nom de l'évènement</label>
-        <input value="{{ data.title if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.title else normal_class }}" name="title" type="text" id="title">
+        <input value="{{ data.title if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error and error.title else normal_class }}" name="title" type="text" id="title">
         {% if error and error.title %}
             <p class="text-red-600 text-sm mt-1">{{ error.title }}</p>
         {% endif %}
@@ -29,13 +29,17 @@
 
     <div>
         <label class="block font-medium mb-1" for="date">Date de l'évènement</label>
-        <input value="{{ data.date if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.date else normal_class }}" type="date" id="date" name="date" min="2026-01-01" max="3018-12-31"/>
-        {% if error and error.date %} {{ error.date }} {% endif %}
+        <input value="{{ data.date if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error and (error.date_str or error.date) else normal_class }}" type="date" id="date" name="date" min="2026-01-01" max="3018-12-31"/>
+        {% if error and error.date_str %}
+            <p class="text-red-600 text-sm mt-1">{{ error.date_str }}</p>
+        {% elif error and error.date %}
+            <p class="text-red-600 text-sm mt-1">{{ error.date }}</p>
+        {% endif %}
     </div>
 
     <div>
         <label class="block font-medium mb-1" for="place" id="place">Lieu de l'évènement</label>
-        <input value="{{ data.place if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.place else normal_class }}" type="text" name="place" id="place"></input>
+        <input value="{{ data.place if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error and error.place else normal_class }}" type="text" name="place" id="place"></input>
         {% if error and error.place %}
             <p class="text-red-600 text-sm mt-1">{{ error.place }}</p>
         {% endif %}
@@ -43,7 +47,7 @@
 
     <div>
         <label class="block font-medium mb-1" for="description" id="description">Description de l'évènement</label>
-        <textarea class="w-full rounded px-3 py-2 {{ error_class if error.description else normal_class }}" type="text" name="description" id="description">{{ data.description if data else '' }}</textarea>
+        <textarea class="w-full rounded px-3 py-2 {{ error_class if error and error.description else normal_class }}" type="text" name="description" id="description">{{ data.description if data else '' }}</textarea>
         {% if error and error.description %}
             <p class="text-red-600 text-sm mt-1">{{ error.description }}</p>
         {% endif %}

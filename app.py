@@ -2,15 +2,22 @@ from flask import Flask, jsonify, render_template, request, url_for, redirect, f
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from datetime import datetime
+from babel.dates import format_date
 
 app = Flask(__name__)
-app.secret_key = "super-mns-riz-crousty"
+app.secret_key = "best-teacher"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ideabox.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Renvoie un dictionnaire "format_date" aux templates avant chaque rendu de template. Utilisé pour formater la date de la liste des évènements.
+@app.context_processor
+def inject_format_date():
+    return dict(format_date=format_date)
+
+# Création du modèle de la base de données lors de la création d'un évènement 
 class Event(db.Model):
     __tablename__ = 'create_event'
     
@@ -26,19 +33,21 @@ class Event(db.Model):
     def __repr__(self):
         return f"Event('{self.title}', '{self.type}', '{self.date}', '{self.place}', '{self.description}', '{self.submission_date}')"
 
+# Création de la base de données
 with app.app_context():
     db.create_all()
 
 # Route qui mène vers la page d'accueil d'IdeaBox avec la liste des évènements
 @app.route("/", methods=['GET'])
 def list_events() :
+    
+    # Requête "SQL" de l'ORM qui selectionne tous les évènements et les trie en fonction de la date
     events = Event.query.order_by(Event.date.asc()).all()
     return render_template("list-events.html", events=events)
 
-# Routes qui mènent vers la page de création d'un évènement
+# Route qui mène vers la page de création d'un évènement
 @app.route("/create-event", methods=['POST'])
 def create_event_post() : 
-    # has_error = False
     error = {}
     
     # Title #
@@ -72,6 +81,8 @@ def create_event_post() :
         return render_template("create-event.html", error=error, data=request.form)
     
     event = Event(title=title, type=type, date=date, place=place, description=description)
+    
+    # Si l'évènement ne présente pas d'erreur alors il est ajouté et est commité sur la base de données
     db.session.add(event)
     db.session.commit()
     
@@ -101,6 +112,7 @@ def delete_event(event_id):
 def list_next_five_events() :
     events = (Event.query
         .filter(func.date(Event.date) >= func.date(func.now()))
+        .order_by(Event.date.asc())
         .limit(5)
         .all()
     )

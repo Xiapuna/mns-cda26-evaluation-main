@@ -17,7 +17,7 @@
             <tr class="border-b hover:bg-gray-50">
                 <td class="py-3 px-4">{{event.title}}</td>
                 <td class="py-3 px-4">{{event.type}}</td>
-                <td class="py-3 px-4">{{event.date.strftime("%d/%m/%Y")}}</td>
+                <td class="py-3 px-4">{{format_date(event.date, format="d MMMM y", locale="fr")}}</td>
                 <td class="py-3 px-4">{{event.place}}</td>
                 <td class="py-3 px-4">{{event.description}}</td>
                 <td class="py-3 px-4">
