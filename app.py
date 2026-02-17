@@ -38,32 +38,38 @@ def list_events() :
 # Routes qui mènent vers la page de création d'un évènement
 @app.route("/create-event", methods=['POST'])
 def create_event_post() : 
-    has_error = False
+    # has_error = False
+    error = {}
     
+    # Title #
     title = request.form.get("title")
     if not title :
-        flash("A name is required.", "error")
-        has_error = True
+        error['title'] = "A name is required."
+    
+    # Type #
     type = request.form.get("type")
-    if not type :
-        flash("A type is required.","error")
-        has_error = True
+    
+    # Date #
     date_str = request.form.get("date")
     if not date_str :
-        flash("Date is required.","error")
-        has_error = True
-    place = request.form.get("place")
+            error['date_str'] = "Date is required." 
+    else :
+        date = datetime.fromisoformat(date_str)
+        if date.date() < datetime.now().date() :
+            error['date'] = "An earlier date is impossible."
+    
+    # Place #
+    place = request.form.get("place", "error")
     if not place :
-        flash("A place is required.","error")
-        has_error = True
+        error['place'] = "A place is required."
+    
+    # Description #
     description = request.form.get("description")
     if not description :
-        flash("A description is required.","error")
-        has_error = True
-    if has_error:
-        return redirect(url_for("create_event_get"))
+        error['description'] = "A description is required."
     
-    date = datetime.fromisoformat(date_str)
+    if error :
+        return render_template("create-event.html", error=error, data=request.form)
     
     event = Event(title=title, type=type, date=date, place=place, description=description)
     db.session.add(event)
@@ -83,9 +89,7 @@ def create_event_get() :
 @app.route("/delete-event/<int:event_id>")
 def delete_event(event_id):
     event = Event.query.get(event_id)
-    if not event : 
-        flash("Entrée d'historique non trouvée", "error")
-        return redirect(url_for("list_events"))
+    flash(f"Event «{ event.title }» has been deleted", "success")
     
     db.session.delete(event)
     db.session.commit()

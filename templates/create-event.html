@@ -1,38 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
+
+{% set error_class = "border border-red-500 focus:border-red-500 focus:ring-red-500" %}
+{% set normal_class = "border border-gray-300 focus:border-green-500 focus:ring-green-500" %}
+
 <h2 class="text-2xl font-semibold mb-6">Créer un nouvel évènement</h2>
 
 <form action="/create-event" method="POST" class="space-y-6">
     <div>
-        <label class="block font-medium mb-1" for="title">Titre de l'évènement</label>
-        <input class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500" name="title" type="text" id="title" required></input>
+        <label class="block font-medium mb-1" for="title">Nom de l'évènement</label>
+        <input value="{{ data.title if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.title else normal_class }}" name="title" type="text" id="title">
+        {% if error and error.title %}
+            <p class="text-red-600 text-sm mt-1">{{ error.title }}</p>
+        {% endif %}
     </div>
 
+    <div>
+        <label class="block font-medium mb-1" for="type">Type de l'évènement</label>
+        <select class="w-full rounded px-3 py-2 border border-gray-300 focus:border-green-500 focus:ring-green-500" name="type" id="type">
+            <option value="conference" {% if data and data.type == "conference" %}selected{% endif %}>Conférence</option>
+            <option value="team-building" {% if data and data.type == "team-building" %}selected{% endif %}>Team Building</option>
+            <option value="atelier" {% if data and data.type == "atelier" %}selected{% endif %}>Atelier</option>
+            <option value="sortie" {% if data and data.type == "sortie" %}selected{% endif %}>Sortie</option>
+            <option value="repas-equipe" {% if data and data.type == "repas-equipe" %}selected{% endif %}>Repas d'équipe</option>
+            <option value="afterwork" {% if data and data.type == "afterwork" %}selected{% endif %}>Afterwork</option>
+        </select>
+    </div>
 
-    <label class="block font-medium mb-1" for="type">Type d'évènement</label>
-    <select class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500" name="type" id="type">
-        <option value="conference">Conférence</option>
-        <option value="conference">Team Building</option>
-        <option value="atelier">Atelier</option>
-        <option value="conference">Sortie</option>
-        <option value="sortie_equipe">Repas d'équipe</option>
-        <option value="afterwork">Afterwork</option>
-    </select>
+    <div>
+        <label class="block font-medium mb-1" for="date">Date de l'évènement</label>
+        <input value="{{ data.date if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.date else normal_class }}" type="date" id="date" name="date" min="2026-01-01" max="3018-12-31"/>
+        {% if error and error.date %} {{ error.date }} {% endif %}
+    </div>
 
-    <label class="block font-medium mb-1" for="date">Date de l'évènement</label>
-    <input class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500" type="date" id="date" name="date" min="2026-01-01" max="3018-12-31" required/>
+    <div>
+        <label class="block font-medium mb-1" for="place" id="place">Lieu de l'évènement</label>
+        <input value="{{ data.place if data else '' }}" class="w-full rounded px-3 py-2 {{ error_class if error.place else normal_class }}" type="text" name="place" id="place"></input>
+        {% if error and error.place %}
+            <p class="text-red-600 text-sm mt-1">{{ error.place }}</p>
+        {% endif %}
+    </div>
 
-    <label class="block font-medium mb-1" for="place" id="place">Lieu de l'évènement</label>
-    <input class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500" type="text" name="place" id="place" required></input>
+    <div>
+        <label class="block font-medium mb-1" for="description" id="description">Description de l'évènement</label>
+        <textarea class="w-full rounded px-3 py-2 {{ error_class if error.description else normal_class }}" type="text" name="description" id="description">{{ data.description if data else '' }}</textarea>
+        {% if error and error.description %}
+            <p class="text-red-600 text-sm mt-1">{{ error.description }}</p>
+        {% endif %}
+    </div>
 
-    <label class="block font-medium mb-1" for="description" id="description">Description de l'évènement</label>
-    <textarea class="w-full border border-gray-300 rounded px-3 py-2 h-24 focus:ring-indigo-500 focus:border-indigo-500" type="text" name="description" id="description" required></textarea>
-
-    <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700" type="submit">Valider l'évènement</button>
+    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" type="submit">Valider l'évènement</button>
 </form>
 
 <div class="mt-6">
-    <a class="inline-block text-indigo-600 hover:text-indigo-800 font-medium" href="{{url_for('list_events')}}">Voir la liste des évènements à venir</a>
+    <a class="inline-block text-green-600 hover:text-green-800 font-medium" href="{{url_for('list_events')}}">Voir la liste des évènements à venir</a>
 </div>
-
 {% endblock %}
