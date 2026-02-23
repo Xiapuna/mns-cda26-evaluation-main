@@ -107,8 +107,8 @@ def delete_event(event_id):
     
     return redirect(url_for("list_events"))
 
-# Route qui affiche les 5 prochains évènements (API)
-@app.route("/list-next-five-events")
+# Route qui affiche les 5 prochains évènements à partir de la date du jour (API)
+@app.route("/list-next-five-events", methods=['GET'])
 def list_next_five_events() :
     events = (Event.query
         .filter(func.date(Event.date) >= func.date(func.now()))
@@ -120,12 +120,15 @@ def list_next_five_events() :
     clean_events = []
     for event in events :
         clean_events.append({
+            "id": event.id,
             "title": event.title,
             "type": event.type,
             "date": event.date,
             "place": event.place,
-            "description": event.description
+            "description": event.description,
+            "submission_date": event.submission_date
         })
+    
     return jsonify(
         {
             "next-five-events": clean_events
