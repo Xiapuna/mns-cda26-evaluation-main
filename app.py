@@ -134,3 +134,7 @@ def list_next_five_events() :
             "next-five-events": clean_events
         }
     )
+
+# Lignes qui permettent de lancer l'application en mode débug (debug=False pour la production) à la place de la commande "flask run --debug"
+if __name__=="__main__":
+    app.run(debug=True)
